@@ -54,53 +54,41 @@ button.active {
 }
 
 /* Canvas area */
-.canvas-container {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #12121a;
-}
-
 canvas {
-  width: 960px;
-  height: 540px;
-  background: white;
-  cursor: crosshair;
+  cursor: none;
+  touch-action: none;
+  image-rendering: auto;
 }
 
-.panel {
+.canvas-container {
+  touch-action: none;
+}
+
+.panel-tab {
   position: absolute;
-  background: #1a1a24;
-  border: 1px solid #2a2a35;
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  z-index: 20;
+  background: #2a2a35;
+  color: white;
+  border: 1px solid #3a2a4a;
   border-radius: 6px;
-}
-
-.panel-header {
-  font-weight: bold;
+  padding: 6px 10px;
   cursor: pointer;
-  margin-bottom: 4px;
 }
 
-.left {
+.left-tab {
   left: 10px;
   top: 60px;
 }
 
-.right {
+.right-tab {
   right: 10px;
   top: 60px;
 }
 
-.bottom {
+.bottom-tab {
   bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
-  flex-direction: row;
 }
 
 .canvas-wrap {
