@@ -271,15 +271,31 @@ export default function App() {
       down(ctx, x, y) {
         ctx.globalCompositeOperation = "source-over";
         ctx.strokeStyle = color;
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+
+        lastPointRef.current = { x, y };
+
         ctx.beginPath();
         ctx.moveTo(x, y);
       },
+
       move(ctx, x, y) {
-        ctx.lineTo(x, y);
+        const last = lastPointRef.current;
+        if (!last) return;
+
+        const midX = (last.x + x) / 2;
+        const midY = (last.y + y) / 2;
+
+        ctx.quadraticCurveTo(last.x, last.y, midX, midY);
         ctx.stroke();
+
+        lastPointRef.current = { x, y };
       },
+
       up(ctx) {
         ctx.closePath();
+        lastPointRef.current = null;
       },
     },
 
@@ -318,6 +334,8 @@ export default function App() {
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     ctx.lineWidth = size * pressure;
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
 
     tools[tool].down(ctx, x, y);
   };
@@ -334,6 +352,8 @@ export default function App() {
 
     const pressure = e.pointerType === "pen" ? Math.max(e.pressure, 0.2) : 1;
     ctx.lineWidth = size * pressure;
+
+    onPointerMove={handlePointerMove}
 
     tools[tool].move(ctx, x, y);
     redraw();

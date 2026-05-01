@@ -74,8 +74,8 @@ button.active {
 }
 
 canvas {
-  width: 960px;
-  height: 540px;
+  width: 1600;
+  height: 900;
   background: white;
   cursor: none;
   touch-action: none;
