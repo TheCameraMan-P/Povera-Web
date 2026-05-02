@@ -201,3 +201,17 @@ canvas {
   opacity: 0.7;
   font-size: 12px;
 }
+
+.color-buttons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.color-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid white;
+  padding: 0;
+}

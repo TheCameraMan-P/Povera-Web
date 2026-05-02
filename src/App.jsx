@@ -535,6 +535,17 @@ export default function App() {
         </div>
       )}
 
+      <div className="color-buttons">
+        {["#000000", "#ffffff", "#ff3b30", "#ffcc00", "#34c759", "#007aff", "#af52de"].map((c) => (
+          <button
+            key={c}
+            className="color-dot"
+            style={{ background: c }}
+            onClick={() => setColor(c)}
+          />
+        ))}
+      </div>
+
       {!showSettings && (
         <button
           className="panel-tab right-tab"
