@@ -287,17 +287,16 @@ export default function App() {
       const last = lastPointRef.current;
       if (!last) return;
 
-      // smoother curve
       const midX = (last.x + x) / 2;
       const midY = (last.y + y) / 2;
 
       ctx.quadraticCurveTo(last.x, last.y, midX, midY);
+      ctx.stroke();
 
       lastPointRef.current = { x, y };
     },
 
     up(ctx) {
-      ctx.stroke(); // ONLY stroke once at the end
       ctx.closePath();
       lastPointRef.current = null;
     },
