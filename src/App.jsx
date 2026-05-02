@@ -10,6 +10,8 @@ export default function App() {
   const undoRef = useRef([[], []]);
   const redoRef = useRef([[], []]);
   const gestureRef = useRef(null);
+  const gestureActiveRef = useRef(false);
+  const lastPointRef = useRef(null);
 
   const [activeLayer, setActiveLayer] = useState(0);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -317,6 +319,7 @@ export default function App() {
   };
 
   const handlePointerDown = (e) => {
+    if (gestureActiveRef.current) return;
     if (e.pointerType === "touch" && !e.isPrimary) return;
 
     e.preventDefault();
@@ -342,7 +345,7 @@ export default function App() {
 
   const handlePointerMove = (e) => {
     updateCursor(e);
-
+    if (gestureActiveRef.current) return;
     if (!isDrawing) return;
 
     e.preventDefault();
@@ -352,8 +355,6 @@ export default function App() {
 
     const pressure = e.pointerType === "pen" ? Math.max(e.pressure, 0.2) : 1;
     ctx.lineWidth = size * pressure;
-
-    onPointerMove={handlePointerMove}
 
     tools[tool].move(ctx, x, y);
     redraw();
@@ -373,26 +374,25 @@ export default function App() {
     canvasRef.current.releasePointerCapture?.(e.pointerId);
   };
 
-  const getTouchDistance = (t1, t2) => {
-    return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+  const getTouchAngle = (t1, t2) => {
+    return Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX) * 180 / Math.PI;
   };
-
-  const getTouchCenter = (t1, t2) => ({
-    x: (t1.clientX + t2.clientX) / 2,
-    y: (t1.clientY + t2.clientY) / 2,
-  });
 
   const handleTouchStart = (e) => {
     if (e.touches.length !== 2) return;
 
+    gestureActiveRef.current = true;
+    setIsDrawing(false);
     e.preventDefault();
 
     const [t1, t2] = e.touches;
 
     gestureRef.current = {
       startDistance: getTouchDistance(t1, t2),
+      startAngle: getTouchAngle(t1, t2),
       startCenter: getTouchCenter(t1, t2),
       startScale: view.scale,
+      startRotation: view.rotation,
       startX: view.x,
       startY: view.y,
     };
@@ -401,18 +401,22 @@ export default function App() {
   const handleTouchMove = (e) => {
     if (e.touches.length !== 2 || !gestureRef.current) return;
 
+    gestureActiveRef.current = true;
     e.preventDefault();
 
     const [t1, t2] = e.touches;
     const g = gestureRef.current;
 
     const newDistance = getTouchDistance(t1, t2);
+    const newAngle = getTouchAngle(t1, t2);
     const newCenter = getTouchCenter(t1, t2);
+
     const scaleChange = newDistance / g.startDistance;
+    const angleChange = newAngle - g.startAngle;
 
     setView({
       scale: Math.min(Math.max(g.startScale * scaleChange, 0.5), 4),
-      rotation: 0,
+      rotation: g.startRotation + angleChange,
       x: g.startX + (newCenter.x - g.startCenter.x),
       y: g.startY + (newCenter.y - g.startCenter.y),
     });
@@ -420,7 +424,20 @@ export default function App() {
 
   const handleTouchEnd = () => {
     gestureRef.current = null;
+
+    setTimeout(() => {
+      gestureActiveRef.current = false;
+    }, 100);
   };
+
+  const getTouchDistance = (t1, t2) => {
+    return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+  };
+
+  const getTouchCenter = (t1, t2) => ({
+    x: (t1.clientX + t2.clientX) / 2,
+    y: (t1.clientY + t2.clientY) / 2,
+  });
 
   const exportPNG = () => {
     redraw();
@@ -595,7 +612,7 @@ export default function App() {
         <div
           className="canvas-wrap"
           style={{
-            transform: `translate(${view.x}px, ${view.y}px) scale(${view.scale})`,
+            transform: `translate(${view.x}px, ${view.y}px) scale(${view.scale}) rotate(${view.rotation}deg)`,
           }}
         >
           <canvas
