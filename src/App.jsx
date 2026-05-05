@@ -12,6 +12,7 @@ export default function App() {
   const gestureRef = useRef(null);
   const gestureActiveRef = useRef(false);
   const lastPointRef = useRef(null);
+  const activePointersRef = useRef(new Set());
 
   const [activeLayer, setActiveLayer] = useState(0);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -71,20 +72,24 @@ export default function App() {
   }, [layerVisible]);
 
   const getPoint = (e) => {
-    const rect = canvasRef.current.getBoundingClientRect();
+    const canvas = canvasRef.current;
+
+    const offsetX = e.nativeEvent?.offsetX ?? e.offsetX;
+    const offsetY = e.nativeEvent?.offsetY ?? e.offsetY;
 
     return {
-      x: ((e.clientX - rect.left) / rect.width) * WIDTH,
-      y: ((e.clientY - rect.top) / rect.height) * HEIGHT,
+      x: (offsetX / canvas.clientWidth) * WIDTH,
+      y: (offsetY / canvas.clientHeight) * HEIGHT,
     };
   };
 
   const updateCursor = (e) => {
-    const rect = canvasRef.current.getBoundingClientRect();
+    const offsetX = e.nativeEvent?.offsetX ?? e.offsetX;
+    const offsetY = e.nativeEvent?.offsetY ?? e.offsetY;
 
     setCursor({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: offsetX,
+      y: offsetY,
       visible: true,
     });
   };
@@ -320,9 +325,17 @@ export default function App() {
   };
 
   const handlePointerDown = (e) => {
+    activePointersRef.current.add(e.pointerId);
+
+    if (activePointersRef.current.size > 1) {
+      setIsDrawing(false);
+      gestureActiveRef.current = true;
+      return;
+    }
+    
     if (gestureActiveRef.current) return;
     if (e.pointerType === "touch" && !e.isPrimary) return;
-
+    
     e.preventDefault();
     canvasRef.current.setPointerCapture?.(e.pointerId);
 
@@ -359,6 +372,9 @@ export default function App() {
   };
 
   const handlePointerUp = (e) => {
+    if (activePointersRef.current.size === 0) {
+      gestureActiveRef.current = false;
+    }
     if (!isDrawing) return;
 
     setIsDrawing(false);
@@ -621,7 +637,7 @@ export default function App() {
         <div
           className="canvas-wrap"
           style={{
-            transform: `translate(${view.x}px, ${view.y}px) scale(${view.scale}) rotate(${view.rotation}deg)`,
+            transform: `translate(${view.x}px, ${view.y}px) scale(${view.scale})`,
           }}
         >
           <canvas
