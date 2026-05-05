@@ -27,7 +27,6 @@ export default function App() {
 
   const [view, setView] = useState({
     scale: 1,
-    rotation: 0,
     x: 0,
     y: 0,
   });
@@ -388,10 +387,7 @@ export default function App() {
     canvasRef.current.releasePointerCapture?.(e.pointerId);
   };
 
-  const getTouchAngle = (t1, t2) => {
-    return Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX) * 180 / Math.PI;
-  };
-
+  
   const handleTouchStart = (e) => {
     if (e.touches.length !== 2) return;
 
@@ -403,10 +399,8 @@ export default function App() {
 
     gestureRef.current = {
       startDistance: getTouchDistance(t1, t2),
-      startAngle: getTouchAngle(t1, t2),
       startCenter: getTouchCenter(t1, t2),
       startScale: view.scale,
-      startRotation: view.rotation,
       startX: view.x,
       startY: view.y,
     };
@@ -422,15 +416,12 @@ export default function App() {
     const g = gestureRef.current;
 
     const newDistance = getTouchDistance(t1, t2);
-    const newAngle = getTouchAngle(t1, t2);
     const newCenter = getTouchCenter(t1, t2);
 
     const scaleChange = newDistance / g.startDistance;
-    const angleChange = newAngle - g.startAngle;
 
     setView({
       scale: Math.min(Math.max(g.startScale * scaleChange, 0.5), 4),
-      rotation: g.startRotation + angleChange,
       x: g.startX + (newCenter.x - g.startCenter.x),
       y: g.startY + (newCenter.y - g.startCenter.y),
     });
