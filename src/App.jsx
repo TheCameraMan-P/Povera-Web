@@ -371,11 +371,11 @@ export default function App() {
   };
 
   const handlePointerUp = (e) => {
-    if (activePointersRef.current.size === 0) {
-      gestureActiveRef.current = false;
-    }
     if (!isDrawing) return;
 
+    if (activePointersRef.current.size === 0) {
+          gestureActiveRef.current = false;
+        }
     setIsDrawing(false);
 
     const ctx = layerCanvasesRef.current[activeLayer].getContext("2d");
