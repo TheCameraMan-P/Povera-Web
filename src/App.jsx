@@ -371,11 +371,15 @@ export default function App() {
   };
 
   const handlePointerUp = (e) => {
-    if (!isDrawing) return;
+    activePointersRef.current.delete(e.pointerId);
 
-    if (activePointersRef.current.size === 0) {
-          gestureActiveRef.current = false;
-        }
+    if (!isDrawing) {
+      if (activePointersRef.current.size === 0) {
+        gestureActiveRef.current = false;
+      }
+      return;
+    }
+
     setIsDrawing(false);
 
     const ctx = layerCanvasesRef.current[activeLayer].getContext("2d");
@@ -385,8 +389,11 @@ export default function App() {
     saveToBrowser();
 
     canvasRef.current.releasePointerCapture?.(e.pointerId);
-  };
 
+    if (activePointersRef.current.size === 0) {
+      gestureActiveRef.current = false;
+    }
+  };
   
   const handleTouchStart = (e) => {
     if (e.touches.length !== 2) return;
