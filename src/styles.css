@@ -209,9 +209,10 @@ canvas {
 }
 
 .color-dot {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   border: 2px solid white;
   padding: 0;
+  touch-action: manipulation;
 }

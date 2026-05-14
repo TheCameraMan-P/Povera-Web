@@ -538,6 +538,27 @@ export default function App() {
             onChange={(e) => setColor(e.target.value)}
           />
 
+          <div className="color-buttons">
+            {[
+              "#000000",
+              "#ffffff",
+              "#ff3b30",
+              "#ff9500",
+              "#ffcc00",
+              "#34c759",
+              "#007aff",
+              "#5856d6",
+              "#af52de",
+            ].map((c) => (
+              <button
+                key={c}
+                className="color-dot"
+                style={{ background: c }}
+                onPointerDown={() => setColor(c)}
+              />
+            ))}
+          </div>
+
           <label>Size: {size}</label>
           <input
             type="range"
@@ -548,17 +569,6 @@ export default function App() {
           />
         </div>
       )}
-
-      <div className="color-buttons">
-        {["#000000", "#ffffff", "#ff3b30", "#ffcc00", "#34c759", "#007aff", "#af52de"].map((c) => (
-          <button
-            key={c}
-            className="color-dot"
-            style={{ background: c }}
-            onClick={() => setColor(c)}
-          />
-        ))}
-      </div>
 
       {!showSettings && (
         <button
