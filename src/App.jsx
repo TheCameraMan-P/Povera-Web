@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from "react";
+import { Analytics } from "@vercel/analytics/react";
 
 const WIDTH = 1280;
 const HEIGHT = 720;
@@ -673,6 +674,7 @@ export default function App() {
           )}
         </div>
       </div>
+      <Analytics />
     </div>
   );
 }
